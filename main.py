@@ -1,9 +1,12 @@
 from machine import Pin
 from DHT22 import DHT22
-from ePaper import EPD_2in9_B
+#from ePaper import EPD_2in9_B
 from ds18x20 import DS18X20
 from onewire import OneWire
 import time
+
+SAMPLE_INTERVAL = 60 # in seconds
+BASE_TIME = time.time()
 
 #Initialize the onboard LED as output
 led = Pin(25, Pin.OUT)
@@ -16,40 +19,30 @@ ds = DS18X20(OneWire(Pin(2)))
 rom = ds.scan()[0]
 
 # Clear EPD screen
-epd = EPD_2in9_B()
-epd.Clear(0xff, 0xff)
-time.sleep_ms(5000)
+#epd = EPD_2in9_B()
+#epd.Clear(0xff, 0xff)
+#time.sleep_ms(5000)
 
-f = open('datalog1.txt', 'w')
-f.write('Datetime,DHT22_Temp,DHT22_Humid,DS18x20_Temp\n')
+f = open('datalog' + str(BASE_TIME) + '.txt', 'w')
+f.write('Base time = ' + str(BASE_TIME) + '\n\n')
+f.write('Seconds,DS18x20_Temp,DHT22_Temp,DHT22_Humid\n')
 
 while True:
-    ds.convert_temp()
-    Tdx = ds.read_temp(rom)
-    
-    T, H = dht22.read()
-    
-    #Write Humidity value. Convert the humidity into two decimal places.
-    #print(str('H: ' +"{:0.1f}".format(H)+ "%"), str('T: ' +"{:0.1f}".format(T)+ "C"))
-    epd.imageblack.fill(0x00)
-    epd.imagered.fill(0xff)
-    epd.imageblack.text(str('Temp_1: ' +"{:0.1f}".format(T)+ "C"), 0, 60, 0xff)
-    epd.imageblack.text(str('Temp_2: ' +"{:0.1f}".format(Tdx)+ "C"), 0, 80, 0xff)
-    epd.imageblack.text(str('Humid_1: ' +"{:0.1f}".format(H)+ "%"), 0, 160, 0xff)
-    epd.imageblack.hline(10, 120, 118, 0xff)
-    
-    epd.display()
-    
-    f.write(str(time.time()))
-    f.write(',' + "{:0.1f}".format(T))
-    f.write(',' + "{:0.1f}".format(H))
-    f.write(',' + "{:0.1f}".format(Tdx))
-    f.write('\n')
-    
     
     led.toggle()
-    time.sleep_ms(200)
-    led.value(T>30)
     
-    # Wait for Five seconds. Then proceed to collect next sensor reading.
-    time.sleep_ms(1000)
+    ds.convert_temp()
+    T1 = ds.read_temp(rom)
+    
+    T2, H2 = dht22.read()
+   
+    f.write(str(time.time()-BASE_TIME))
+    f.write(',' + "{:0.1f}".format(T1))
+    f.write(',' + "{:0.1f}".format(T2))
+    f.write(',' + "{:0.1f}".format(H2))
+    f.write('\n')
+    
+    led.toggle()
+    
+    # Wait
+    time.sleep_ms(SAMPLE_INTERVAL*1000)
