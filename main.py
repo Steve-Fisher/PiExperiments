@@ -20,6 +20,8 @@ epd = EPD_2in9_B()
 epd.Clear(0xff, 0xff)
 time.sleep_ms(5000)
 
+f = open('datalog1.txt', 'w')
+f.write('Datetime,DHT22_Temp,DHT22_Humid,DS18x20_Temp\n')
 
 while True:
     ds.convert_temp()
@@ -37,7 +39,14 @@ while True:
     epd.imageblack.hline(10, 120, 118, 0xff)
     
     epd.display()
-
+    
+    f.write(str(time.time()))
+    f.write(',' + "{:0.1f}".format(T))
+    f.write(',' + "{:0.1f}".format(H))
+    f.write(',' + "{:0.1f}".format(Tdx))
+    f.write('\n')
+    
+    
     led.toggle()
     time.sleep_ms(200)
     led.value(T>30)
