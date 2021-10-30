@@ -1,12 +1,9 @@
 from machine import Pin
 from DHT22 import DHT22
-#from ePaper import EPD_2in9_B
+from oled import OLED_1inch3
 from ds18x20 import DS18X20
 from onewire import OneWire
 import time
-
-SAMPLE_INTERVAL = 60 # in seconds
-BASE_TIME = time.time()
 
 #Initialize the onboard LED as output
 led = Pin(25, Pin.OUT)
@@ -18,31 +15,22 @@ dht22 = DHT22(Pin(4,Pin.IN,Pin.PULL_UP))
 ds = DS18X20(OneWire(Pin(2)))
 rom = ds.scan()[0]
 
-# Clear EPD screen
-#epd = EPD_2in9_B()
-#epd.Clear(0xff, 0xff)
-#time.sleep_ms(5000)
+# Clear display
+OLED = OLED_1inch3()
+OLED.fill(0x0000) 
+OLED.show()
 
-f = open('datalog' + str(BASE_TIME) + '.txt', 'w')
-f.write('Base time = ' + str(BASE_TIME) + '\n\n')
-f.write('Seconds,DS18x20_Temp,DHT22_Temp,DHT22_Humid\n')
 
 while True:
-    
-    led.toggle()
-    
     ds.convert_temp()
-    T1 = ds.read_temp(rom)
+    Tdx = ds.read_temp(rom)
+    time.sleep_ms(200)
+
+    T, H = dht22.read()
+ 
+    OLED.fill(0x0000) 
+    OLED.text("Temp_1: " +"{:0.1f}".format(T)+ "C",1,10,OLED.white)
+    OLED.text('Temp_2: ' +"{:0.1f}".format(Tdx)+ "C",1,27,OLED.white)
+    OLED.text('Humid_1: ' +"{:0.1f}".format(H)+ "%",1,44,OLED.white)  
+    OLED.show()
     
-    T2, H2 = dht22.read()
-   
-    f.write(str(time.time()-BASE_TIME))
-    f.write(',' + "{:0.1f}".format(T1))
-    f.write(',' + "{:0.1f}".format(T2))
-    f.write(',' + "{:0.1f}".format(H2))
-    f.write('\n')
-    
-    led.toggle()
-    
-    # Wait
-    time.sleep_ms(SAMPLE_INTERVAL*1000)
