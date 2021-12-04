@@ -1,0 +1,19 @@
+# To create a new screen:
+#screen bash
+
+# To list screens
+screen -list
+
+# To reconnect to a screen
+screen -r [screen name]
+
+# Inside screen
+cd /home/pi
+
+python3 Pi3main.py
+
+# To detatch from screen
+Crtl+A then D
+
+Terminate a screen Instance
+Crtl+D
