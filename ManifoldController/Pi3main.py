@@ -13,7 +13,6 @@ TEMP_SENSORY_RETURN_ID  = '28-01204d08a566'
 TEMP_SENSORY_ROOM_ID    = '28-01204d165394'
 
 TEMP_SCALE = 'C'
-BASE_TIME = time.localtime()
 
 TEMP_LIMIT = 18
 READ_INTERVAL = 60 # seconds
@@ -30,7 +29,7 @@ relay_heat = devices.Relay(RELAY_PIN)
 relay_heat.open(True)
 relay_heat.open(False)
 
-f = open('datalog' + str(BASE_TIME) + '.txt', 'a')
+f = open('datalog_' + time.strftime('%Y%m%d%H%M%S', time.localtime()) + '.txt', 'a')
 f.write('Time,Outside,Flow,Return,Room,Call\n')
 
 first_loop = True
