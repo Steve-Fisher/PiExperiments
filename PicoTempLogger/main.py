@@ -3,7 +3,7 @@ from ds18x20 import DS18X20
 from onewire import OneWire
 import time
 
-SAMPLE_INTERVAL = 10 # in seconds
+SAMPLE_INTERVAL = 60 # in seconds
 
 #Initialize the onboard LED as output
 led = Pin(25, Pin.OUT)
@@ -31,7 +31,7 @@ while True:
     
     time.sleep_ms(200)
     
-    print(str(t1) + ' | ' + str(t2))
+    #print(str(t1) + ' | ' + str(t2))
     
     f.write(dtstr(time.localtime()))
     f.write(',' + "{:0.1f}".format(t1))
