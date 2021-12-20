@@ -85,7 +85,7 @@ while True:
                     records_since_relay_change = -1
                     
             # Condition to turn off heat
-            if t_flow_avg > slab_target_temp:
+            if t_return_avg > slab_target_temp:
                 if relay_state == True:
                     relay_state = False
                     records_since_relay_change = -1
