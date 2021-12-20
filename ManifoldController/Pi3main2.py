@@ -33,7 +33,7 @@ relay_heat.open(False)
 f = open('datalog_' + time.strftime('%Y%m%d%H%M%S', time.localtime()) + '.txt', 'a')
 f.write('Time,Outside,Flow,Return,Room,RollingAvgOutside,SlabTarget,SlabTrigger,SlabModelled,Call\n')
 
-t_outside = t_flow = t_return = t_room = 0
+t_outside_cum = t_flow_cum = t_return_cum = t_room_cum = 0
 read_counter = 0
 t_outside_list = []
 records_since_relay_change = 0
@@ -41,20 +41,20 @@ heat_off_slab_temp = ts_flow.read_temp()
 
 while True:
     
-    t_outside += ts_outside.read_temp()
-    t_flow    += ts_flow.read_temp()
-    t_return  += ts_return.read_temp()
-    t_room    += ts_room.read_temp()
+    t_outside_cum += ts_outside.read_temp()
+    t_flow_cum    += ts_flow.read_temp()
+    t_return_cum  += ts_return.read_temp()
+    t_room_cum    += ts_room.read_temp()
     read_counter += 1
     
     time.sleep(READ_INTERVAL)
     
     if read_counter*READ_INTERVAL >= RECORD_INTERVAL:
         
-        t_outside_avg = t_outside / read_counter
-        t_flow_avg    = t_flow    / read_counter
-        t_return_avg  = t_return  / read_counter
-        t_room_avg    = t_room    / read_counter
+        t_outside_avg = t_outside_cum / read_counter
+        t_flow_avg    = t_flow_cum    / read_counter
+        t_return_avg  = t_return_cum  / read_counter
+        t_room_avg    = t_room_cum    / read_counter
         
         # Rolling average outside temperature
         t_outside_list.append(t_outside_avg)
@@ -66,19 +66,19 @@ while True:
         slab_target_temp = 25 - (2*t_outside_rolling_avg/5)
         slab_trigger_temp = slab_target_temp - 3
         
-        # Modelled slab temperatur
-        x = records_since_heat_off*RECORD_INVERVAL/(60*15)  # Modelled in 15 minute intervals
+        # Modelled slab temperature
+        x = records_since_relay_change*RECORD_INVERVAL/(60*15)  # Modelled in 15 minute intervals
         modelled_slab_temp = x*x*0.0092 - x*0.5143 + 25.267
         
-        if t_room_avg < TEMP_LIMIT or modelled_slab_temp < slab_trigger_temp:
+        if t_room_avg < TEMP_LIMIT or modelled_slab_temp < slab_trigger_temp: # Need to add condition that the relay is False
             # Call for heat
             relay_heat.open(True)
-            records_since_relay_change = 0
+            records_since_relay_change = -1
             
         if t_flow_avg > slab_target_temp and records_since_relay_change*RECORD_INTERVAL > RELAY_CYCLE_INTERVAL_LIMIT:
             # Turn off heat
             relay_heat.open(False)
-            records_since_relay_change = 0
+            records_since_relay_change = -1
             heat_off_slab_temp = t_flow_avg
             
         f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
@@ -94,6 +94,6 @@ while True:
         f.write('\n')
         f.flush()
     
-        t_outside = t_flow = t_return = t_room = 0
+        t_outside_cum = t_flow_cum = t_return_cum = t_room_cum = 0
         read_counter = 0
         records_since_relay_change += 1
