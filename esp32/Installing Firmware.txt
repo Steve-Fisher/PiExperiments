@@ -1,0 +1,1 @@
+Firmware page to ESP32 (install using Thonny): https://micropython.org/download/esp32/
