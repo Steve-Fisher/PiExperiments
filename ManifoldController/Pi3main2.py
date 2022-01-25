@@ -1,5 +1,6 @@
 import devices
 import time
+import json, requests
 
 #import glob
 #base_dir = '/sys/bus/w1/devices/'
@@ -7,10 +8,11 @@ import time
 #print(device_id)
 
 RELAY_PIN = 17
-TEMP_SENSORY_OUTSIDE_ID = '28-3c01e07644fc'
+#TEMP_SENSORY_OUTSIDE_ID = '28-3c01e07644fc'
 TEMP_SENSORY_FLOW_ID    = '28-01204d205a25'
 TEMP_SENSORY_RETURN_ID  = '28-01204d08a566'
 TEMP_SENSORY_ROOM_ID    = '28-01204d165394'
+TEMP_API_URL = 'http://192.168.0.192/api'
 
 TEMP_SCALE = 'C'
 
@@ -20,7 +22,7 @@ RECORD_INTERVAL = 60*5 # 5 minutes
 OUTSIDE_TEMP_ROLLING_AVG = 60*60*6 # 6 hours
 RELAY_CYCLE_INTERVAL_LIMIT = 60*30  # 30 minutes
 
-ts_outside = devices.TempSensor(TEMP_SENSORY_OUTSIDE_ID, TEMP_SCALE)
+#ts_outside = devices.TempSensor(TEMP_SENSORY_OUTSIDE_ID, TEMP_SCALE)
 ts_flow    = devices.TempSensor(TEMP_SENSORY_FLOW_ID   , TEMP_SCALE)
 ts_return  = devices.TempSensor(TEMP_SENSORY_RETURN_ID , TEMP_SCALE)
 ts_room    = devices.TempSensor(TEMP_SENSORY_ROOM_ID   , TEMP_SCALE)
@@ -42,11 +44,16 @@ records_since_relay_change = 0
 heat_off_slab_temp = ts_return.read_temp()
 relay_state = False
 
+def get_outside_temp():
+    response = requests.get(TEMP_API_URL)
+    temp = json.loads(response.text)['temp']
+    return temp
+
 while True:
     
     print('read_counter = ' + str(read_counter) + ' | record_counter = ' + str(record_counter), end='\r')
     
-    t_outside_cum += ts_outside.read_temp()
+    t_outside_cum += get_outside_temp()
     t_flow_cum    += ts_flow.read_temp()
     t_return_cum  += ts_return.read_temp()
     t_room_cum    += ts_room.read_temp()
