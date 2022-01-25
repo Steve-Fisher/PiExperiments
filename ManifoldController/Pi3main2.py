@@ -43,10 +43,16 @@ t_outside_list = []
 records_since_relay_change = 0
 heat_off_slab_temp = ts_return.read_temp()
 relay_state = False
+last_temp_read = 14
 
 def get_outside_temp():
-    response = requests.get(TEMP_API_URL)
-    temp = json.loads(response.text)['temp']
+    try:
+        response = requests.get(TEMP_API_URL)
+        temp = json.loads(response.text)['temp']
+    except:
+        temp = last_temp_read
+    else:
+        last_temp_read = temp
     return temp
 
 while True:
