@@ -26,7 +26,7 @@ TEMP_API_URL = 'http://192.168.0.192/api'
 TEMP_SCALE = 'C'
 
 TARGET_ROOM_TEMP = 18
-READ_INTERVAL = 30 # seconds
+READ_INTERVAL = 60 # seconds
 RECORD_INTERVAL = 60*5 # 5 minutes
 OUTSIDE_TEMP_ROLLING_AVG = 60*60*6 # 6 hours
 RELAY_CYCLE_INTERVAL_LIMIT = 60*30  # 30 minutes
@@ -53,10 +53,15 @@ t_outside_list = []
 records_since_relay_change = 0
 heat_off_slab_temp = ts_return.read_temp()
 relay_state = False
+last_outside_temp = 12.0
 
 def get_outside_temp():
-    response = requests.get(TEMP_API_URL)
-    temp = json.loads(response.text)['temp']
+    try:
+        response = requests.get(TEMP_API_URL)
+        temp = json.loads(response.text)['temp']
+        last_outside_temp = temp
+    except:
+        temp = last_outside_temp
     return temp
 
 while True:
