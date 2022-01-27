@@ -1,0 +1,2 @@
+Time,Outside,Flow,Return,Room,RollingAvgOutside,SlabTarget,SlabTrigger,SlabModelled,records_since_relay_change,heat_off_slab_temp,Call
+2022-01-27 17:45:38,6.8,25.3,22.8,18.0,6.8,22.3,19.3,22.8,0,22.8,0
