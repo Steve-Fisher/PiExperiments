@@ -57,10 +57,11 @@ last_outside_temp = 12.0
 
 def get_outside_temp():
     global last_outside_temp
-    temp = last_outside_temp
     try:
         response = requests.get(TEMP_API_URL)
         temp = json.loads(response.text)['temp']
+    except:
+        temp = last_outside_temp        
     finally:
         last_outside_temp = temp
     return temp
