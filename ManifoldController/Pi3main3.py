@@ -112,9 +112,8 @@ while True:
             if relay_state == False and modelled_slab_temp < slab_trigger_temp:
                 relay_state = True
                 records_since_relay_change = -1
-                    
-            # Condition to turn off heat
-            if relay_state == True and t_return_avg > slab_target_temp:
+            # Condition to turn off heat (can only be made if call for heat hasn't been made)
+            elif relay_state == True and t_return_avg > slab_target_temp:
                 relay_state = False
                 records_since_relay_change = -1
                 heat_off_slab_temp = t_return_avg
