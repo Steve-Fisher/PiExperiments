@@ -31,6 +31,7 @@ RECORD_INTERVAL = 60*5 # 5 minutes
 OUTSIDE_TEMP_ROLLING_AVG = 60*60*6 # 6 hours
 RELAY_CYCLE_INTERVAL_LIMIT = 60*30  # 30 minutes
 SLAB_TEMP_RANGE = 3
+SLAB_TEMP_DECAY_PERCENTAGE = 0.01
 
 #ts_outside = devices.TempSensor(TEMP_SENSORY_OUTSIDE_ID, TEMP_SCALE)
 ts_flow    = devices.TempSensor(TEMP_SENSORY_FLOW_ID   , TEMP_SCALE)  # This isn't needed, but kept for into
@@ -54,6 +55,7 @@ records_since_relay_change = 0
 heat_off_slab_temp = ts_return.read_temp()
 relay_state = False
 last_outside_temp = 12.0
+modelled_slab_temp = 18.0
 
 def get_outside_temp():
     global last_outside_temp
@@ -99,11 +101,11 @@ while True:
         slab_trigger_temp = slab_target_temp - SLAB_TEMP_RANGE
         
         # Modelled slab temperature
-        # TO DO - Learn is modelled slab temperature is matching return temperature when UFH is turned back on
-        #         Check t_return_avg @ records_since_relay_change=1 against modelled_slab_temp @ records_since_relay_change=-1
-        #         Nudge the equation to half the error at the appropriate records_since_relay_change position
-        x = records_since_relay_change*RECORD_INTERVAL/(60*15)  # Modelled in 15 minute intervals
-        modelled_slab_temp = x*x*0.0092 - x*0.5143 + heat_off_slab_temp
+        if relay_state == True:
+            modelled_slab_temp = t_return_avg
+        else:
+            temp_difference = modelled_slab_temp - t_outside_rolling_avg
+            modelled_slab_temp = modelled_slab_temp - (temp_difference * SLAB_TEMP_DECAY_PERCENTAGE)
         
         # Enough time has elapsed since the last relay state change
         if records_since_relay_change*RECORD_INTERVAL > RELAY_CYCLE_INTERVAL_LIMIT:
