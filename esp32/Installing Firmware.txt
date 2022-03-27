@@ -1,1 +1,9 @@
 Firmware page to ESP32 (install using Thonny): https://micropython.org/download/esp32/
+
+May require pressing the "boot" or "boot + en" button to get esptool to connect properly.
+
+esptool.py --chip esp32 --port /dev/ttyUSB0 erase_flash
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20190125-v1.10.bin
+
+USB Serial Driver: https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
+
