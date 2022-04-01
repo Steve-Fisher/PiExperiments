@@ -97,7 +97,7 @@ while True:
         # TO DO - Learn is slab_target_temp is keeping room at right temperature
         #         Once a day, check average room temp against average outside temp
         #         Nudge slab_target_temp to half the error
-        slab_target_temp = 25 - (2*t_outside_rolling_avg/5)
+        slab_target_temp = 23 - (0.5*t_outside_rolling_avg)
         slab_trigger_temp = slab_target_temp - SLAB_TEMP_RANGE
         
         # Modelled slab temperature
