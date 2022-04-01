@@ -44,7 +44,7 @@ relay_heat.open(True)
 relay_heat.open(False)
 
 f = open('datalog_' + time.strftime('%Y%m%d%H%M%S', time.localtime()) + '.txt', 'a')
-f.write('Time,Outside,Flow,Return,Room,RollingAvgOutside,SlabTarget,SlabTrigger,SlabModelled,records_since_relay_change,heat_off_slab_temp,Call\n')
+f.write('Time,Outside,Flow,Return,Room,RollingAvgOutside,SlabTarget,SlabTrigger,SlabModelled,records_since_relay_change,Call\n')
 f.flush()
 
 t_outside_cum = t_flow_cum = t_return_cum = t_room_cum = 0
@@ -52,7 +52,6 @@ read_counter = 0
 record_counter = 0
 t_outside_list = []
 records_since_relay_change = 0
-heat_off_slab_temp = ts_return.read_temp()
 relay_state = False
 last_outside_temp = 12.0
 modelled_slab_temp = 18.0
@@ -118,7 +117,6 @@ while True:
             elif relay_state == True and t_return_avg > slab_target_temp:
                 relay_state = False
                 records_since_relay_change = -1
-                heat_off_slab_temp = t_return_avg
             
             relay_heat.open(relay_state)
             
@@ -133,7 +131,6 @@ while True:
         f.write(',' + "{:0.1f}".format(slab_trigger_temp))
         f.write(',' + "{:0.1f}".format(modelled_slab_temp))
         f.write(',' + "{:0.0f}".format(records_since_relay_change))
-        f.write(',' + "{:0.1f}".format(heat_off_slab_temp))
         f.write(',' + "{:0.0f}".format(relay_state))
         f.write('\n')
         f.flush()
