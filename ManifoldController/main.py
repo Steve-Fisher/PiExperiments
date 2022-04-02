@@ -31,7 +31,7 @@ RECORD_INTERVAL = 60*5 # 5 minutes
 OUTSIDE_TEMP_ROLLING_AVG = 60*60*6 # 6 hours
 RELAY_CYCLE_INTERVAL_LIMIT = 60*30  # 30 minutes
 SLAB_TEMP_RANGE = 3
-SLAB_TEMP_DECAY_PERCENTAGE = 0.01
+SLAB_TEMP_DECAY_PERCENTAGE = 0.005
 
 #ts_outside = devices.TempSensor(TEMP_SENSORY_OUTSIDE_ID, TEMP_SCALE)
 ts_flow    = devices.TempSensor(TEMP_SENSORY_FLOW_ID   , TEMP_SCALE)  # This isn't needed, but kept for into
