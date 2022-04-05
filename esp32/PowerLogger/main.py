@@ -10,7 +10,10 @@ def get_voltage():
 
     a = sum(l)/len(l)
     rms = (sum([(i-a)**2 for i in l])/len(l))**0.5
-    return rms
+    
+    p = ((rms-33.9668) / 0.08633 ) - 70
+    
+    return p
 
 
 def web_page():
@@ -23,8 +26,7 @@ def web_page():
     .ds-labels{ font-size: 1.5rem; vertical-align:middle; padding-bottom: 15px; }
   </style></head><body><h2>Home Power User</h2>
   <p>
-    <span class="ds-labels">Reading</span>
-    <span id="reading">""" + str(v) + """</span>
+    <span id="reading">""" + "%.0f watts" % v + """</span>
   </p></body></html>"""
   html = str(v)
   return html
