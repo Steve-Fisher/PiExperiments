@@ -7,7 +7,7 @@ import json, requests
 
 TEMP_API_URL = 'http://192.168.0.136'
 
-READ_INTERVAL = 5 # seconds
+READ_INTERVAL = 15 # seconds
 
 f = open('powerlog_' + time.strftime('%Y%m%d%H%M%S', time.localtime()) + '.txt', 'a')
 f.write('Time,Value\n')
@@ -30,7 +30,7 @@ while True:
     p = get_power()
 
     f.write(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
-    f.write(',' + p)
+    f.write(',' + str(round(float(p))))
     f.write('\n')
     f.flush()
 
