@@ -1,7 +1,8 @@
 from machine import Pin
 from time import sleep
 
-pin_list = [23, 21, 22, 19, 18, 5, 17, 16, 15]
+pin_list = [2, 4, 17, 16, 15, 5, 18]
+
 led_list = []
 
 for p in pin_list:
@@ -9,10 +10,26 @@ for p in pin_list:
     led_list.append(Pin(p, Pin.OUT))
     
 def test_leds():
+    TEST_SLEEP_INTERVAL = 0.2
     for l in led_list:
         l.value(1)
-        sleep(0.2)
+        sleep(TEST_SLEEP_INTERVAL)
         l.value(0)
+    sleep(TEST_SLEEP_INTERVAL)
+    
+    set_temp(-1) # All off (low temp)
+    sleep(TEST_SLEEP_INTERVAL)
+    
+    set_temp(5) # Some on, some off
+    sleep(TEST_SLEEP_INTERVAL*3)
+    
+    set_temp(-1) # All off (low temp)
+    sleep(TEST_SLEEP_INTERVAL*2)
+    
+    set_temp(99) # All on (high temp)
+    sleep(TEST_SLEEP_INTERVAL*3)
+    
+    set_temp(-1)  # All off for exit
 
 def set_temp(temp):
     i = 0
@@ -20,19 +37,7 @@ def set_temp(temp):
         l.value(i<=temp)
         i += 1
 
+# Startup Test
 test_leds()
 
-sleep(1)
-set_temp(2)
-
-sleep(1)
-set_temp(5)
-
-sleep(1)
-set_temp(0)
-
-sleep(1)
-set_temp(10)
-
-sleep(1)
-set_temp(-1)
+#set_temp(99)
