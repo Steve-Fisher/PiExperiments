@@ -11,3 +11,6 @@ sudo python3 esptool.py --port /dev/ttyUSB0 erase_flash
 Had to pip uninstall serial then pip install pyserial to get esptool.py to work
 
 sudo python3 esptool.py --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 /home/sf/Downloads/micropython_cmake_9fef1c0bd_esp32_idf4.x_ble_camera.bin
+
+
+Looks like I can get VSCode working on Linux to program an ESP32: https://lemariva.com/blog/2019/08/micropython-vsc-ide-intellisense
