@@ -14,3 +14,5 @@ sudo python3 esptool.py --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 
 
 
 Looks like I can get VSCode working on Linux to program an ESP32: https://lemariva.com/blog/2019/08/micropython-vsc-ide-intellisense
+The above didn't pan out (ended up down a C-program VSCode Extension rabbit hole).  However, this does work :-)  https://randomnerdtutorials.com/micropython-esp32-esp8266-vs-code-pymakr/
+
