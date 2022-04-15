@@ -1,43 +1,64 @@
 from machine import Pin
 from time import sleep
 
-pin_list = [2, 4, 17, 16, 15, 5, 18]
+# Dictionary of temperature and led pin numbers
+pin_dict = {-7:4, -6:2, -5:15, -4:16, -3:17, -2:5, -1:18, 0:19, 1:21, 2:22, 3:23, 4:32, 5:33, 6:25, 7:26, 8:27, 9:14, 10:12, 11:13}
 
-led_list = []
-
-for p in pin_list:
+# Dictionary of temperature and led pin objects
+led_dict = {}
+for t,p in pin_dict.items():
     Pin(p, Pin.OUT).value(0)
-    led_list.append(Pin(p, Pin.OUT))
+    led_dict[t] = Pin(p, Pin.OUT)
+    
+
+def set_all(value):
+    for t, l in led_dict.items():
+        l.value(value)
+
     
 def test_leds():
-    TEST_SLEEP_INTERVAL = 0.2
-    for l in led_list:
-        l.value(1)
-        sleep(TEST_SLEEP_INTERVAL)
-        l.value(0)
-    sleep(TEST_SLEEP_INTERVAL)
+'''
+Function to test the leds.
+* Do they all work?
+* Is the sequence right?
+'''
     
-    set_temp(-1) # All off (low temp)
-    sleep(TEST_SLEEP_INTERVAL)
+    # Turn all on
+    set_all(True)
+    sleep(1)
+
+    # Turn all off
+    set_all(False)
+    sleep(0.5)
+
+    # Turn on in sequence from coldest to warmest
+    for i in range(-7,11):
+        led_dict[i].value(True)
+        sleep(0.05)
+    sleep(0.5)
+
+    # Reset (all off)
+    set_all(False)
     
-    set_temp(5) # Some on, some off
-    sleep(TEST_SLEEP_INTERVAL*3)
-    
-    set_temp(-1) # All off (low temp)
-    sleep(TEST_SLEEP_INTERVAL*2)
-    
-    set_temp(99) # All on (high temp)
-    sleep(TEST_SLEEP_INTERVAL*3)
-    
-    set_temp(-1)  # All off for exit
 
 def set_temp(temp):
-    i = 0
-    for l in led_list:
-        l.value(i<=temp)
-        i += 1
+    # 0 maps to Pin 19 at position 8 in pin_list
+    # Above 0, light pins at and above position 8
+    # Below 0, light pins at and below position 8
 
-# Startup Test
+    for t, l in led_dict.items():
+        # Minus temperature - light from 0 down to temp
+        if temp < 0 and t < 0 and t >= temp:
+            l.value(True)
+        # Positive temperature - light from 0 up to temp            
+        elif temp > 0 and t > 0 and t <= temp:
+            l.value(True)
+        # Zero (freezing) - just light 0            
+        elif t == 0:
+            l.value(True)
+        else:
+            l.value(False)
+    
 test_leds()
 
-#set_temp(99)
+set_temp(0)
