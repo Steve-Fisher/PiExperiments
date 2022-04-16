@@ -49,6 +49,24 @@ def set_temp(temp):
         else:
             l.value(False)
     
+def test_temp():
+    
+    INTERVAL = 0.1
+    
+    for t in range(0,-7,-1):
+        sleep(INTERVAL)
+        set_temp(t)
+
+    for t in range(-7,31,1):
+        sleep(INTERVAL)
+        set_temp(t)
+
+    for t in range(30,0,-1):
+        sleep(INTERVAL)
+        set_temp(t)
+
+
 test_leds()
+test_temp()
 
 set_temp(0)

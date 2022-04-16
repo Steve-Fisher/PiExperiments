@@ -18,7 +18,6 @@ def set_all(value):
     
 def test_leds():
 # Function to test the leds.  Do they all work?  Is the sequence right?
-
     
     # Turn all on
     set_all(True)
@@ -55,7 +54,25 @@ def set_temp(temp):
             l.value(True)
         else:
             l.value(False)
+
+def test_temp():
     
+    INTERVAL = 0.1
+    
+    for t in range(0,-7,-1):
+        sleep(INTERVAL)
+        set_temp(t)
+
+    for t in range(-7,31,1):
+        sleep(INTERVAL)
+        set_temp(t)
+
+    for t in range(30,0,-1):
+        sleep(INTERVAL)
+        set_temp(t)
+
+
 test_leds()
+test_temp()
 
 set_temp(0)
