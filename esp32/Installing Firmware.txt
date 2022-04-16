@@ -7,3 +7,5 @@ esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 
 
 USB Serial Driver: https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
 
+
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 micropython_camera_feeeb5ea3_esp32_idf4_4.bin
