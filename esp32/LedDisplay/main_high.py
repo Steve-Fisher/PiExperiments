@@ -1,5 +1,8 @@
 from machine import Pin
 from time import sleep
+import usocket
+
+API_READ_INTERVAL = 60  # Seconds
 
 # Dictionary of temperature and led pin numbers
 pin_dict = {12:13, 13:15, 14:2, 15:21, 16:23, 17:4, 18:16, 19:5, 20:18, 21:17, 22:22, 23:19, 24:32, 25:33, 26:25, 27:26, 28:27, 29:14, 30:12}
@@ -15,10 +18,21 @@ def set_all(value):
     for t, l in led_dict.items():
         l.value(value)
 
-    
-def test_leds():
-    # Function to test the leds. Do they all work? Is the sequence right?
-    
+def set_temp(temp):
+    # 0 maps to Pin 19 at position 8 in pin_list
+    # Above 0, light pins at and above position 8
+    # Below 0, light pins at and below position 8
+
+    for t, l in led_dict.items():
+        # Positive temperature - light from 0 up to temp            
+        if temp > 0 and t <= temp:
+            l.value(True)
+        else:
+            l.value(False)
+
+def tests():
+    # Test the leds.  Do they all work?  Is the sequence right?
+
     # Turn all on
     set_all(True)
     sleep(1)
@@ -35,24 +49,11 @@ def test_leds():
 
     # Reset (all off)
     set_all(False)
-    
+      
 
-def set_temp(temp):
-    # 0 maps to Pin 19 at position 8 in pin_list
-    # Above 0, light pins at and above position 8
-    # Below 0, light pins at and below position 8
-
-    for t, l in led_dict.items():
-        # Positive temperature - light from 0 up to temp            
-        if t <= temp:
-            l.value(True)
-        else:
-            l.value(False)
-    
-def test_temp():
-    
+    # Show off cascading the leds up and down
     INTERVAL = 0.1
-    
+
     for t in range(0,-7,-1):
         sleep(INTERVAL)
         set_temp(t)
@@ -65,8 +66,58 @@ def test_temp():
         sleep(INTERVAL)
         set_temp(t)
 
+    #  Reset to 0
+    set_temp(0)
 
-test_leds()
-test_temp()
 
-set_temp(0)
+################################################################
+
+def gettemp():
+    
+    temp_api_url = '192.168.0.192'
+    temp_api_port = 80
+
+    socket_write_string = '''GET /api HTTP/1.0
+Host: ''' + temp_api_url + '''
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-GB,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Sec-GPC: 1
+Cache-Control: max-age=0
+
+'''
+
+    ai = usocket.getaddrinfo(temp_api_url, temp_api_port, 0, usocket.SOCK_STREAM)
+    ai = ai[0]
+
+    s = usocket.socket(ai[0], ai[1], ai[2])
+    s.connect(ai[-1])
+
+    socket_write_bytes = bytes(socket_write_string, 'utf-8')
+
+    s.write(socket_write_bytes)
+
+    line = s.readline()
+    find_string = '"temp": '
+
+    while line != b'':
+        if str(line).find(find_string) > 0:
+            templine = str(line)
+        line = s.readline()
+
+    # Get just the temperature
+    temp = templine[12:][:4]
+
+    return round(float(temp))
+
+
+tests()
+
+while True:
+    t = gettemp()
+    set_temp(t)
+    print(t)
+    sleep(API_READ_INTERVAL)
+        
