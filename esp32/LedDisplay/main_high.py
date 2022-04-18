@@ -66,14 +66,15 @@ def tests():
         sleep(INTERVAL)
         set_temp(t)
 
-    #  Reset to 0
-    set_temp(0)
-
+    # Reset (all off)
+    set_all(False)
 
 ################################################################
 
 def gettemp():
     
+    led_dict[30].value(True)
+
     temp_api_url = '192.168.0.192'
     temp_api_port = 80
 
@@ -110,6 +111,8 @@ Cache-Control: max-age=0
     # Get just the temperature
     temp = templine[12:][:4]
 
+    led_dict[30].value(False)
+    
     return round(float(temp))
 
 
@@ -118,6 +121,5 @@ tests()
 while True:
     t = gettemp()
     set_temp(t)
-    print(t)
     sleep(API_READ_INTERVAL)
         
