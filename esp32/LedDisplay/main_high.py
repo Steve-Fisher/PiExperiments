@@ -75,7 +75,7 @@ def gettemp():
     
     led_dict[30].value(True)
 
-    temp_api_url = '192.168.0.192'
+    temp_api_url = '192.168.0.124'
     temp_api_port = 80
 
     socket_write_string = '''GET /api HTTP/1.0
