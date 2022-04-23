@@ -29,6 +29,8 @@ station.connect(ssid, password)
 while station.isconnected() == False:
   pass
 
+#print(station.ifconfig())
+
 print('Connection successful')
 print(station.ifconfig())
 

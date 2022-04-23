@@ -3,7 +3,7 @@ def read_ds_sensor():
   #print('Found DS devices: ', roms)
   #for rom in roms:
   #rom = bytearray(b'(\xb0\x18\x0bM \x01q')  #roms[0]
-  rom = bytearray(b'(\xfcDv\xe0\x01<X')
+  rom = bytearray(b'(\xb0\x18\x0bM \x01q')
   ds_sensor.convert_temp()
   temp = ds_sensor.read_temp(rom)
   if isinstance(temp, float):
