@@ -21,7 +21,7 @@ RELAY_PIN = 17
 TEMP_SENSORY_FLOW_ID    = '28-01204d205a25'  # This isn't needed, but kept for into
 TEMP_SENSORY_RETURN_ID  = '28-01204d08a566'
 TEMP_SENSORY_ROOM_ID    = '28-01204d165394'
-TEMP_API_URL = 'http://192.168.0.192/api'
+TEMP_API_URL = 'http://192.168.0.124/api'
 
 TEMP_SCALE = 'C'
 
