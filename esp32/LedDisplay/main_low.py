@@ -2,7 +2,8 @@ from machine import Pin
 from time import sleep
 import usocket
 
-API_READ_INTERVAL = 60  # Seconds
+API_READ_INTERVAL = 5  # Seconds
+TEMP_API_URL = '192.168.0.124'
 
 # Dictionary of temperature and led pin numbers
 pin_dict = {-7:4, -6:2, -5:15, -4:16, -3:17, -2:5, -1:18, 0:19, 1:21, 2:22, 3:23, 4:32, 5:33, 6:25, 7:26, 8:27, 9:14, 10:12, 11:13}
@@ -81,12 +82,9 @@ def tests():
 def gettemp():
     
     led_dict[-7].value(True)
-    
-    temp_api_url = '192.168.0.124'
-    temp_api_port = 80
 
     socket_write_string = '''GET /api HTTP/1.0
-Host: ''' + temp_api_url + '''
+Host: ''' + TEMP_API_URL + '''
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
 Accept-Language: en-GB,en;q=0.5
 Accept-Encoding: gzip, deflate
@@ -97,7 +95,7 @@ Cache-Control: max-age=0
 
 '''
 
-    ai = usocket.getaddrinfo(temp_api_url, temp_api_port, 0, usocket.SOCK_STREAM)
+    ai = usocket.getaddrinfo(TEMP_API_URL, 80, 0, usocket.SOCK_STREAM)
     ai = ai[0]
 
     s = usocket.socket(ai[0], ai[1], ai[2])
