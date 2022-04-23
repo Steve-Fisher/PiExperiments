@@ -1,3 +1,39 @@
+try:
+  import usocket as socket
+except:
+  import socket
+  
+from time import sleep
+from machine import Pin
+import onewire, ds18x20
+
+import network
+
+import esp
+esp.osdebug(None)
+
+import gc
+gc.collect()
+
+ds_pin = Pin(4)
+ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
+
+ssid = 'ATC24'
+password = 'Svalbard'
+
+station = network.WLAN(network.STA_IF)
+
+station.active(True)
+station.connect(ssid, password)
+
+while station.isconnected() == False:
+  pass
+
+print('Connection successful')
+print(station.ifconfig())
+
+########################################################
+
 def read_ds_sensor():
   #roms = ds_sensor.scan()
   #print('Found DS devices: ', roms)
@@ -55,8 +91,8 @@ while True:
     f = request[request.find('GET /') + 5:request.find(' HTTP/')]
     conn.send('HTTP/1.0 200 OK\n')
     if f == 'api':
-        conn.send('Content-Type: application/json\n')
         response = api_response()
+        conn.send('Content-Type: application/json\n')
     else:
         response = web_page()
         conn.send('Content-Type: text/html\n')
