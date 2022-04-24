@@ -2,8 +2,9 @@ from machine import Pin
 from time import sleep
 import usocket
 
-API_READ_INTERVAL = 5  # Seconds
-TEMP_API_URL = '192.168.0.124'
+API_READ_INTERVAL = 60  # Seconds
+TEMP_API_URL = 'http://192.168.0.124/api'
+last_temp = 12
 
 # Dictionary of temperature and led pin numbers
 pin_dict = {-7:4, -6:2, -5:15, -4:16, -3:17, -2:5, -1:18, 0:19, 1:21, 2:22, 3:23, 4:32, 5:33, 6:25, 7:26, 8:27, 9:14, 10:12, 11:13}
@@ -81,43 +82,72 @@ def tests():
 
 def gettemp():
     
+    global last_temp
+    
     led_dict[-7].value(True)
-
-    socket_write_string = '''GET /api HTTP/1.0
-Host: ''' + TEMP_API_URL + '''
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
-Accept-Language: en-GB,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Upgrade-Insecure-Requests: 1
-Sec-GPC: 1
-Cache-Control: max-age=0
-
-'''
-
-    ai = usocket.getaddrinfo(TEMP_API_URL, 80, 0, usocket.SOCK_STREAM)
-    ai = ai[0]
-
-    s = usocket.socket(ai[0], ai[1], ai[2])
-    s.connect(ai[-1])
-
-    socket_write_bytes = bytes(socket_write_string, 'utf-8')
-
-    s.write(socket_write_bytes)
-
-    line = s.readline()
-    find_string = '"temp": '
-
-    while line != b'':
-        if str(line).find(find_string) > 0:
-            templine = str(line)
-        line = s.readline()
-
-    # Get just the temperature
-    temp = templine[12:][:4]
+   
+    try:
+        t = read_temp_api()
+    except:
+        t = last_temp
+    
+    last_temp = t
 
     led_dict[-7].value(False)
     
+    return t
+
+    
+def read_temp_api():
+
+    FIND_STRING = '    <span id="temperature">'
+    END_STRING = '&deg;C</span>'
+
+    try:
+        proto, dummy, host, path = TEMP_API_URL.split("/", 3)
+    except ValueError:
+        proto, dummy, host = TEMP_API_URL.split("/", 2)
+        path = ""
+    if proto == "http:":
+        port = 80
+    else:
+        raise ValueError("Unsupported protocol: " + proto)
+
+    if ":" in host:
+        host, port = host.split(":", 1)
+        port = int(port)
+    
+    ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
+    ai = ai[0]
+    
+    r = b''
+    e = 0
+    
+    while r == b'':
+        
+        try:
+            s = usocket.socket(ai[0], ai[1], ai[2])
+            s.connect(ai[-1])
+            
+            s.write(b"GET /")
+            s.write(path)
+            s.write(b" HTTP/1.0\r\nHost: ")
+            s.write(host)
+            s.write(b"\r\n")
+
+            r = s.read()
+
+            s.close()
+
+        except OSError:
+            e += 1
+            sleep(1)
+            if e == 10:
+                raise
+            
+    r = r.decode('UTF-8')
+    temp = r[r.find(FIND_STRING)+len(FIND_STRING):r.rfind(END_STRING)]
+
     return round(float(temp))
 
 
