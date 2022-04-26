@@ -1,34 +1,18 @@
-ROM = bytearray(b'(\xb0\x18\x0bM \x01q')
-
-#####################################################################################
-
-ds_sensor.convert_temp()
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('', 80))
-s.listen(5)
-
-#####################################################################################
-
 def read_ds_sensor():
-
-  global ROM
-  
   #roms = ds_sensor.scan()
   #print('Found DS devices: ', roms)
   #for rom in roms:
   #rom = bytearray(b'(\xb0\x18\x0bM \x01q')  #roms[0]
-
-  temp = ds_sensor.read_temp(ROM)
-  
+  rom = bytearray(b'(\xb0\x18\x0bM \x01q')
+  ds_sensor.convert_temp()
+  temp = ds_sensor.read_temp(rom)
   if isinstance(temp, float):
-    rtn = round(temp, 1)
-  else:
-    rtn = -99
- 
-  return rtn
-
-
+    msg = round(temp, 1)
+#    print(temp, end=' ')
+#    print('Valid temperature')
+    return msg
+  return b'0.0'
+  
 def web_page():
   temp = read_ds_sensor()
   html = """<!DOCTYPE HTML><html>
@@ -46,15 +30,14 @@ def web_page():
 </html>"""
   return html
 
-
 def api_response():
   temp = read_ds_sensor()
-  json = """{
-  "temp": """ + str(temp) + """
-}"""
+  json = '{\n  "temp": ' + str(temp) + '\n}'
   return bytes(json, 'utf-8')
 
-#####################################################################################
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('', 80))
+s.listen(5)
 
 while True:
   try:
