@@ -8,8 +8,8 @@ def read_ds_sensor():
   temp = ds_sensor.read_temp(rom)
   if isinstance(temp, float):
     msg = round(temp, 1)
-    print(temp, end=' ')
-    print('Valid temperature')
+#    print(temp, end=' ')
+#    print('Valid temperature')
     return msg
   return b'0.0'
   
@@ -32,9 +32,7 @@ def web_page():
 
 def api_response():
   temp = read_ds_sensor()
-  json = """{
-  "temp": """ + str(temp) + """
-}"""
+  json = '{\n  "temp": ' + str(temp) + '\n}'
   return bytes(json, 'utf-8')
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,11 +45,11 @@ while True:
       gc.collect()
     conn, addr = s.accept()
     conn.settimeout(3.0)
-    print('Got a connection from %s' % str(addr))
+#    print('Got a connection from %s' % str(addr))
     request = conn.recv(1024)
     conn.settimeout(None)
     request = str(request)
-    print('Content = %s' % request)
+#    print('Content = %s' % request)
     f = request[request.find('GET /') + 5:request.find(' HTTP/')]
     conn.send('HTTP/1.0 200 OK\n')
     if f == 'api':
@@ -63,7 +61,7 @@ while True:
     conn.send('Connection: close\n\n')
     conn.sendall(response)
     conn.close()
-    print('Sent response %s' % response)
+#    print('Sent response %s' % response)
   except OSError as e:
     conn.close()
-    print('Connection closed')
+#    print('Connection closed')

@@ -1,12 +1,17 @@
 from machine import Pin
 from time import sleep
 import usocket
+import gc
 import params_common as pc
 import params_specific as ps
+
+###########################################################################
 
 last_temp = pc.DEFAULT_TEMP
 min_temp = 99
 max_temp = -99
+
+###########################################################################
 
 # Dictionary of temperature and led pin objects
 led_dict = {}
@@ -17,7 +22,31 @@ for t,p in ps.PIN_DICT.items():
         min_temp = t
     if t > max_temp:
         max_temp = t
-    
+
+# Define socket
+try:
+    proto, dummy, host, path = pc.TEMP_API_URL.split("/", 3)
+except ValueError:
+    proto, dummy, host = pc.TEMP_API_URL.split("/", 2)
+    path = ""
+if proto == "http:":
+    port = 80
+else:
+    raise ValueError("Unsupported protocol: " + proto)
+
+if ":" in host:
+    host, port = host.split(":", 1)
+    port = int(port)
+
+socket_address = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)[0][-1]
+
+sendbytes = b"GET /"
+sendbytes += path
+sendbytes += b" HTTP/1.0\r\nHost: "
+sendbytes += host
+sendbytes += b"\r\n"
+
+###########################################################################
 
 def set_all(value):
     for t, l in led_dict.items():
@@ -90,66 +119,50 @@ def gettemp():
    
     try:
         t = read_temp_api()
+        led_dict[ps.SIGNAL_LED_TEMP].value(False)
     except:
+#        print('Using last temp')
         t = last_temp
     
     last_temp = t
 
-    led_dict[ps.SIGNAL_LED_TEMP].value(False)
-    
     return t
 
 
 def read_temp_api():
-
-    FIND_STRING = '    <span id="temperature">'
-    END_STRING = '&deg;C</span>'
-
-    try:
-        proto, dummy, host, path = pc.TEMP_API_URL.split("/", 3)
-    except ValueError:
-        proto, dummy, host = pc.TEMP_API_URL.split("/", 2)
-        path = ""
-    if proto == "http:":
-        port = 80
-    else:
-        raise ValueError("Unsupported protocol: " + proto)
-
-    if ":" in host:
-        host, port = host.split(":", 1)
-        port = int(port)
-    
-    ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
-    ai = ai[0]
     
     r = b''
     e = 0
-    
+            
     while r == b'':
         
         try:
-            s = usocket.socket(ai[0], ai[1], ai[2])
-            s.connect(ai[-1])
+
+            s = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
+            s.connect(socket_address)
             
-            s.write(b"GET /")
-            s.write(path)
-            s.write(b" HTTP/1.0\r\nHost: ")
-            s.write(host)
-            s.write(b"\r\n")
+            s.send(sendbytes)
 
             r = s.read()
-
+            
             s.close()
-
+            del s
+            
+            gc.collect()
+            
         except OSError:
-            e += 1
-            sleep(1)
             if e == 10:
+                print('Raising error')
                 raise
             
+        if r == b'':
+            e += 1
+            sleep(1)
+            
+
     r = r.decode('UTF-8')
     temp = r[r.find(pc.FIND_STRING)+len(pc.FIND_STRING):r.rfind(pc.END_STRING)]
-
+    
     return round(float(temp))
 
 
