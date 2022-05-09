@@ -19,8 +19,8 @@
 
 #include "camera_pins.h"
 
-const char* ssid = "PLUSNET-CMRK";
-const char* password = "9d6d9e489b";
+const char* ssid = "ATC24";
+const char* password = "Svalbard";
 
 void startCameraServer();
 
