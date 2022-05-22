@@ -1,6 +1,6 @@
 # Making and using a Raspberry Pi database server
 
-Decided to use [SQLite](https://sqlite.org/index.html).  Confirmation this as a sensible choice in [this article](https://chipwired.com/databases-for-raspberry-pi/).
+Decided to use [SQLite](https://sqlite.org/index.html).  Confirmation this as a sensible choice in [this article](https://chipwired.com/databases-for-raspberry-pi/).  ALTHOUGH the main limitation of SQLite is it is not accessible over a network (one can't JDBC/ODBC connect to it from a remote machine).  Using a local webservice called [sqlite-web](https://pypi.org/project/sqlite-web/) to overcome this limitation.
 
 # Setup
 ```sudo apt update```
