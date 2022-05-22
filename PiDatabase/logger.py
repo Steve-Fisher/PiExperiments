@@ -1,4 +1,4 @@
-import time
+import datetime, time
 import json, requests
 import sqlite3
 
@@ -29,16 +29,29 @@ def get_log_header(logID):
     return (api_url, interval_secs)
 
 
-def get_outside_temp(api_url):
-    global last_outside_temp
+def read_outside_temp():
+    global outside_temp_api_url
     try:
-        response = requests.get(api_url)
+        response = requests.get(outside_temp_api_url)
         temp = json.loads(response.text)['temp']
     except:
-        temp = last_outside_temp        
-    finally:
-        last_outside_temp = temp
-    return temp
+        temp = -99
+
+    write_value(1, temp)
+    
+    return
+
+def read_house_current():
+    global house_current_api_url
+    try:
+        response = requests.get(house_current_api_url)
+        v = response.text
+    except:
+        v = -1
+    
+    write_value(2, v)
+    
+    return 
 
 def write_value(logID, value):
     conn = open_connection()
@@ -52,18 +65,27 @@ def write_value(logID, value):
     conn.commit()
     conn.close()
 
+    print('Writen values: logID=', logID, ', value=', value)
+    
+    return
+
 ########################################################################################
 
-api_url, interval_secs = get_log_header(1)
-read_counter = 0
+outside_temp_api_url, outside_temp_interval_secs = get_log_header(1)
+house_current_api_url, house_current_interval_secs = get_log_header(2)
+outside_temp_next_read = datetime.datetime.now()
+house_current_next_read = datetime.datetime.now()
 
 while True:
     
-    print('read_counter = ' + str(read_counter), end='\r')
-    
-    t = get_outside_temp(api_url)
-    
-    write_value(1, t)
+    n = datetime.datetime.now()
 
-    read_counter += 1
-    time.sleep(interval_secs)
+    if n >= outside_temp_next_read:
+        read_outside_temp()
+        outside_temp_next_read = n + datetime.timedelta(seconds=outside_temp_interval_secs)
+
+    if n >= house_current_next_read:
+        read_house_current()
+        house_current_next_read = n + datetime.timedelta(seconds=house_current_interval_secs)
+        
+    time.sleep(5)
