@@ -35,6 +35,9 @@ SQLite is a local database.  Meaning you cannot connect to it directly over a ne
 
 This is then accessible over the (home) network via http://192.168.0.165:8080
 
+## Logging tables ##
+Going to put the code for this is a separate .sql file in this repo
+
 
 
 
