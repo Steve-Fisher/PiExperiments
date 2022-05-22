@@ -3,6 +3,7 @@ import json, requests
 import sqlite3
 
 DB = 'logger.db'
+PRINT_MESSAGES = False
 
 def open_connection():
     conn = None
@@ -10,6 +11,7 @@ def open_connection():
         conn = sqlite3.connect(DB)
     except sqlite3.Error as e:
         print(e)
+
     return conn
 
 def get_log_header(logID):
@@ -25,6 +27,11 @@ def get_log_header(logID):
 
     cur.close()
     conn.close()
+
+    if PRINT_MESSAGES:
+        print('Fetched header information for logID ', logID)        
+        print('api_url is ', api_url)
+        print('interval_secs is ', interval_secs)
 
     return (api_url, interval_secs)
 
@@ -65,7 +72,8 @@ def write_value(logID, value):
     conn.commit()
     conn.close()
 
-    print('Writen values: logID=', logID, ', value=', value)
+    if PRINT_MESSAGES:
+        print('Writen values: logID=', logID, ', value=', value)
     
     return
 
