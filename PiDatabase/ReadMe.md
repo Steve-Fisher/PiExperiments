@@ -31,7 +31,7 @@ SQLite is a local database.  Meaning you cannot connect to it directly over a ne
 
 ```PATH=$PATH:/home/pi/.local/bin```
 
-```sqlite-web --host 192.168.0.165 logger.db```
+```sqlite_web --host 192.168.0.165 logger.db```
 
 This is then accessible over the (home) network via http://192.168.0.165:8080
 
