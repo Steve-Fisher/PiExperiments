@@ -13,7 +13,7 @@ cd /home/pi
 python3 Pi3main.py
 
 # To detatch from screen
-Crtl+A then D
+Crtl+a then d
 
 Terminate a screen Instance
-Crtl+D
+Crtl+d
