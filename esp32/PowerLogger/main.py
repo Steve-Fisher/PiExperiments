@@ -41,6 +41,7 @@ while True:
       gc.collect()
     conn, addr = s.accept()
     conn.settimeout(3.0)
+    # Should add a DEBUG_MODE parameter so these messages don't print in "prod" running
     print('Got a connection from %s' % str(addr))
     request = conn.recv(1024)
     conn.settimeout(None)
@@ -55,3 +56,4 @@ while True:
   except OSError as e:
     conn.close()
     print('Connection closed')
+    # Should add a re-boot command here
