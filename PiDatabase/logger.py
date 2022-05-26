@@ -83,10 +83,13 @@ outside_temp_api_url, outside_temp_interval_secs = get_log_header(1)
 house_current_api_url, house_current_interval_secs = get_log_header(2)
 outside_temp_next_read = datetime.datetime.now()
 house_current_next_read = datetime.datetime.now()
+counter = 0
 
 while True:
     
     n = datetime.datetime.now()
+
+    print("Loop iteration " + str(counter), end="\r")
 
     if n >= outside_temp_next_read:
         read_outside_temp()
@@ -97,3 +100,4 @@ while True:
         house_current_next_read = n + datetime.timedelta(seconds=house_current_interval_secs)
         
     time.sleep(5)
+    counter += 1
