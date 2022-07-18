@@ -1,0 +1,1 @@
+1. Make Raspberry Pi run logger and sqlite_web on re-boot

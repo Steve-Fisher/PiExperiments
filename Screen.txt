@@ -10,7 +10,7 @@ screen -r [screen name]
 # Inside screen
 cd /home/pi
 
-python3 Pi3main.py
+python3 logger.py
 
 # To detatch from screen
 Crtl+a then d
