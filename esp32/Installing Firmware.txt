@@ -1,3 +1,5 @@
+A new Windows machine might require manually installing the CP2102 USB to UART driver from Silicon Labs before the ESP32 will be detected properly as a COM port.  Use Device Manager to find the device and update the driver using one downloaded from here: https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads
+
 Firmware page to ESP32 (install using Thonny): https://micropython.org/download/esp32/
 
 May require pressing the "boot" or "boot + en" button to get esptool to connect properly.
